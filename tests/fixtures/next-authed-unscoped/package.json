@@ -1,0 +1,8 @@
+{
+  "name": "next-authed-unscoped",
+  "private": true,
+  "dependencies": {
+    "next": "14.2.0",
+    "@prisma/client": "5.0.0"
+  }
+}

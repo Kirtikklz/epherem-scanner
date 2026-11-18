@@ -1,0 +1,8 @@
+{
+  "reportVersion": "1.0",
+  "scanId": "scan_0000000000000000",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "scanStatus": "complete",
+  "ruleResults": [{ "ruleId": "xss", "error": "Unsanitized user input may allow XSS", "status": "passed" }],
+  "findings": []
+}

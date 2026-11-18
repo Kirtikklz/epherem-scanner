@@ -1,0 +1,10 @@
+{
+  "name": "clean-basic-project",
+  "private": true,
+  "dependencies": {
+    "next": "14.2.20",
+    "react": "18.3.0",
+    "react-dom": "18.3.0",
+    "next-auth": "4.24.0"
+  }
+}

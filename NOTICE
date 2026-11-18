@@ -1,0 +1,59 @@
+Epherem scanner
+Copyright 2026 Epherem
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The packages bundled into dist/epherem-scanner.cjs, and their licences, are
+listed in THIRD_PARTY_NOTICES.
+
+
+Vulnerability data
+------------------
+
+The package check uses OSV (https://osv.dev), the open-source vulnerability
+database, online, and a copy of some of its records bundled with the scanner
+(src/dependency-audit/osv-cache.json) offline. OSV collects its records from
+these sources, under these licences, as OSV lists them:
+
+  GitHub Advisory Database, by GitHub (identifiers begin GHSA-): CC BY 4.0
+  PyPI Advisory Database, by the Python Packaging Authority (PYSEC-): CC BY 4.0
+  Erlang Ecosystem Foundation CNA (EEF-): CC BY 4.0
+  OpenSSF Malicious Packages, by the Open Source Security Foundation (MAL-):
+    Apache License 2.0
+
+The records are changed: each is converted into the scanner's report format,
+keeping its identifier, summary, affected versions and reference links,
+deriving a severity from its own severity data, and matching its affected
+versions against the versions a project installs. Records under CC BY 4.0 are
+used under that licence (https://creativecommons.org/licenses/by/4.0/), with
+these changes made to them.
+
+
+Ideas credited
+--------------
+
+Some checks follow ideas from these projects. Each idea was re-implemented in
+this scanner's own code; no code was copied.
+
+pgrls (https://github.com/pgrls/pgrls), MIT licence
+  Judging a row-level-security policy by evaluating its condition for an
+  anonymous and for a signed-in caller, rather than by matching the literal
+  `true`; and which conditions to look for: an inverted `auth.uid() IS NULL`
+  test, a policy with no condition on the row's own columns, and an INSERT,
+  UPDATE or ALL policy with no WITH CHECK.
+
+rlsgate (https://github.com/GerardoRdz96/rlsgate), MIT licence
+  A policy whose only condition is `auth.role() = 'authenticated'` grants
+  every row to anyone who can sign up.
+
+CodeQL's JavaScript libraries and queries (https://github.com/github/codeql),
+MIT licence (the libraries and queries only; the CodeQL program is not used)
+  Whether a guard precedes a route and can resume dispatch; a function whose
+  return value tests its argument acts as a guard where its result is used; a
+  URL whose fixed prefix names the destination is not attacker-chosen; and
+  where three queries draw their line: CORS with credentials, weak password
+  hashing of a password-named value, and stack traces in responses.
+
+Supabase's splinter lints describe some of the same conditions. splinter
+carries no licence, so its checks were re-derived from its public
+documentation and nothing of it was copied.

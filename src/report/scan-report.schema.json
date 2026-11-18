@@ -1,0 +1,1951 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://epherem.dev/schemas/scan-report-2.2.json",
+  "title": "Epherem ScanReport 2.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reportVersion",
+    "scanId",
+    "createdAt",
+    "scanStatus",
+    "codeScanStatus",
+    "dependencyAuditStatus",
+    "warnings",
+    "summary",
+    "ruleResults",
+    "coverage",
+    "findings",
+    "fileMapSummary",
+    "projectMapSummary",
+    "dependencyAudit"
+  ],
+  "properties": {
+    "reportVersion": {
+      "enum": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "2.0",
+        "2.1",
+        "2.2"
+      ]
+    },
+    "statusSummary": {
+      "$ref": "#/$defs/statusSummary"
+    },
+    "aiAdjudication": {
+      "$ref": "#/$defs/aiAdjudication"
+    },
+    "projectHygiene": {
+      "$ref": "#/$defs/projectHygiene"
+    },
+    "archiveShape": {
+      "$ref": "#/$defs/archiveShape"
+    },
+    "scanId": {
+      "type": "string",
+      "pattern": "^scan_(?:[0-9a-f]{16}|incomplete_[0-9a-f]{12})$"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scanStatus": {
+      "$ref": "#/$defs/completion"
+    },
+    "codeScanStatus": {
+      "$ref": "#/$defs/completion"
+    },
+    "dependencyAuditStatus": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "not_performed"
+      ]
+    },
+    "warnings": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFindings",
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "detectedStacks"
+      ],
+      "properties": {
+        "totalFindings": {
+          "$ref": "#/$defs/count"
+        },
+        "critical": {
+          "$ref": "#/$defs/count"
+        },
+        "high": {
+          "$ref": "#/$defs/count"
+        },
+        "medium": {
+          "$ref": "#/$defs/count"
+        },
+        "low": {
+          "$ref": "#/$defs/count"
+        },
+        "detectedStacks": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "ruleResults": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ruleResult"
+          },
+          {
+            "$ref": "#/$defs/ruleResultLegacy"
+          }
+        ]
+      }
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "fileMapSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFiles",
+        "totalSkipped",
+        "byLabel"
+      ],
+      "properties": {
+        "totalFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "totalSkipped": {
+          "$ref": "#/$defs/count"
+        },
+        "byLabel": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/count"
+          }
+        }
+      }
+    },
+    "projectMapSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "apiRoutes",
+        "frontendComponents",
+        "authFiles",
+        "middlewareFiles",
+        "databaseFiles",
+        "envFiles",
+        "configFiles",
+        "databaseCalls",
+        "dangerousOperations"
+      ],
+      "properties": {
+        "apiRoutes": {
+          "$ref": "#/$defs/count"
+        },
+        "frontendComponents": {
+          "$ref": "#/$defs/count"
+        },
+        "authFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "middlewareFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "databaseFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "envFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "configFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "databaseCalls": {
+          "$ref": "#/$defs/count"
+        },
+        "dangerousOperations": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    },
+    "routeSecurityProfiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/routeSecurityProfile"
+      }
+    },
+    "dependencyAudit": {
+      "$ref": "#/$defs/dependencyAudit"
+    },
+    "findingsByRule": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ruleFindingSummary"
+      }
+    },
+    "ruleImpacts": {
+      "type": "object",
+      "propertyNames": {
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "failedRules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ruleFindingSummaryLegacy"
+      }
+    },
+    "locationAccess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "limited",
+        "visiblePerRule",
+        "reason"
+      ],
+      "properties": {
+        "limited": {
+          "const": true
+        },
+        "visiblePerRule": {
+          "$ref": "#/$defs/count"
+        },
+        "reason": {
+          "enum": [
+            "free_plan"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reportVersion": {
+            "enum": [
+              "1.2",
+              "1.3",
+              "2.0",
+              "2.1",
+              "2.2"
+            ]
+          }
+        },
+        "required": [
+          "reportVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "routeSecurityProfiles": true
+        },
+        "required": [
+          "routeSecurityProfiles"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reportVersion": {
+            "enum": [
+              "1.3",
+              "2.0",
+              "2.1",
+              "2.2"
+            ]
+          }
+        },
+        "required": [
+          "reportVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "statusSummary": true
+        },
+        "required": [
+          "statusSummary"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reportVersion": {
+            "enum": [
+              "2.0",
+              "2.1",
+              "2.2"
+            ]
+          }
+        },
+        "required": [
+          "reportVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "findingsByRule": true
+        },
+        "required": [
+          "findingsByRule"
+        ]
+      },
+      "else": {
+        "properties": {
+          "failedRules": true
+        },
+        "required": [
+          "failedRules"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reportVersion": {
+            "enum": [
+              "2.1",
+              "2.2"
+            ]
+          }
+        },
+        "required": [
+          "reportVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "aiAdjudication": true
+        },
+        "required": [
+          "aiAdjudication"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reportVersion": {
+            "const": "2.2"
+          }
+        },
+        "required": [
+          "reportVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "projectHygiene": true,
+          "archiveShape": true
+        },
+        "required": [
+          "projectHygiene",
+          "archiveShape"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "aiReviewResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reasoning",
+        "evidenceLocations",
+        "verdict",
+        "confidence",
+        "explanation"
+      ],
+      "properties": {
+        "reasoning": {
+          "type": "string"
+        },
+        "evidenceLocations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "filePath"
+            ],
+            "properties": {
+              "filePath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "controlFound": {
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "confirmed",
+            "false_positive",
+            "unsure"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "recommendedSeverity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "impact": {
+          "enum": [
+            "serious",
+            "worth_fixing",
+            "minor"
+          ]
+        },
+        "impactReason": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    },
+    "aiReviewRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "response",
+        "resolverVersion"
+      ],
+      "properties": {
+        "response": {
+          "$ref": "#/$defs/aiReviewResponse"
+        },
+        "resolverVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "aiReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "placement",
+        "outcome",
+        "cache"
+      ],
+      "properties": {
+        "placement": {
+          "enum": [
+            "ranked",
+            "needs_review",
+            "dismissed_visible",
+            "rules_only"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "verified",
+            "provider-error",
+            "budget-exhausted",
+            "timed-out",
+            "not-required",
+            "withheld"
+          ]
+        },
+        "cache": {
+          "deprecated": true,
+          "enum": [
+            "hit",
+            "miss",
+            "unkeyable",
+            "ambiguous-identity",
+            "not-consulted"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "model_unsure",
+            "low_confidence_dismissal",
+            "serious_dismissal_not_confident",
+            "no_control_named",
+            "inapplicable_not_corroborated",
+            "no_usable_response",
+            "evidence_check_failed",
+            "untrusted_input_markers",
+            "budget_exhausted",
+            "not_required"
+          ]
+        },
+        "recommendedSeverity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "severityClass": {
+          "enum": [
+            "routine",
+            "serious"
+          ]
+        },
+        "reviewAvailable": {
+          "const": true
+        },
+        "scannerSeverity": {
+          "enum": [
+            "critical",
+            "high"
+          ]
+        },
+        "aiJudged": {
+          "const": false
+        },
+        "adjudication": {
+          "$ref": "#/$defs/aiReviewRecord"
+        },
+        "reasoningWithheld": {
+          "const": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "placement": {
+                "const": "ranked"
+              }
+            },
+            "required": [
+              "placement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "recommendedSeverity": true
+            },
+            "required": [
+              "recommendedSeverity"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "placement": {
+                "const": "needs_review"
+              }
+            },
+            "required": [
+              "placement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason": true
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "placement": {
+                "const": "dismissed_visible"
+              }
+            },
+            "required": [
+              "placement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "severityClass": true
+            },
+            "required": [
+              "severityClass"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "placement": {
+                "const": "rules_only"
+              }
+            },
+            "required": [
+              "placement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason": true,
+              "aiJudged": true
+            },
+            "required": [
+              "reason",
+              "aiJudged"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "severityClass": {
+                "const": "serious"
+              }
+            },
+            "required": [
+              "severityClass"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reviewAvailable": true,
+              "scannerSeverity": true
+            },
+            "required": [
+              "reviewAvailable",
+              "scannerSeverity"
+            ]
+          }
+        }
+      ]
+    },
+    "aiAdjudication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "ran",
+            "not_run"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "not_entitled",
+            "unavailable",
+            "not_attempted"
+          ]
+        },
+        "detail": {
+          "enum": [
+            "no_api_key",
+            "no_model",
+            "provider_unavailable",
+            "deadline_exceeded",
+            "engine_error"
+          ]
+        },
+        "byOutcome": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/count"
+          }
+        },
+        "findingsJudged": {
+          "$ref": "#/$defs/count"
+        },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "limit",
+            "spent",
+            "remaining"
+          ],
+          "properties": {
+            "limit": {
+              "$ref": "#/$defs/count"
+            },
+            "spent": {
+              "$ref": "#/$defs/count"
+            },
+            "remaining": {
+              "$ref": "#/$defs/count"
+            },
+            "ceilingHit": {
+              "enum": [
+                "purchase",
+                "scan"
+              ]
+            }
+          }
+        },
+        "question": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "promptVersion",
+            "packetVersion",
+            "resolverVersion"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "promptVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "packetVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resolverVersion": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "not_run"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason": true
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "ran"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "byOutcome": true,
+              "findingsJudged": true,
+              "budget": true,
+              "question": true
+            },
+            "required": [
+              "byOutcome",
+              "findingsJudged",
+              "budget",
+              "question"
+            ]
+          }
+        }
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reportedPathList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paths",
+        "shortened"
+      ],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shortened": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/count"
+          }
+        }
+      }
+    },
+    "projectHygiene": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "checks",
+            "totals"
+          ],
+          "properties": {
+            "state": {
+              "const": "observed"
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "check",
+                  "status"
+                ],
+                "properties": {
+                  "check": {
+                    "enum": [
+                      "gitignore",
+                      "dockerignore",
+                      "lockfile",
+                      "env_template",
+                      "dependency_updates"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "present",
+                      "absent",
+                      "not_applicable"
+                    ]
+                  }
+                }
+              }
+            },
+            "totals": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "present",
+                "absent",
+                "notApplicable",
+                "evaluated"
+              ],
+              "properties": {
+                "present": {
+                  "$ref": "#/$defs/count"
+                },
+                "absent": {
+                  "$ref": "#/$defs/count"
+                },
+                "notApplicable": {
+                  "$ref": "#/$defs/count"
+                },
+                "evaluated": {
+                  "$ref": "#/$defs/count"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "const": "not_observed"
+            },
+            "reason": {
+              "enum": [
+                "no_archive"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "archiveShape": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "scannedFiles",
+            "directories",
+            "unexpectedFiles",
+            "ignoredDirectories",
+            "truncationReasons",
+            "totals"
+          ],
+          "properties": {
+            "state": {
+              "const": "observed"
+            },
+            "rootPrefix": {
+              "type": "string"
+            },
+            "scannedFiles": {
+              "$ref": "#/$defs/reportedPathList"
+            },
+            "directories": {
+              "$ref": "#/$defs/reportedPathList"
+            },
+            "unexpectedFiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "category",
+                  "count",
+                  "sample"
+                ],
+                "properties": {
+                  "category": {
+                    "enum": [
+                      "private_keys",
+                      "cloud_credentials",
+                      "database_dumps",
+                      "infrastructure_state"
+                    ]
+                  },
+                  "count": {
+                    "$ref": "#/$defs/count"
+                  },
+                  "sample": {
+                    "$ref": "#/$defs/reportedPathList"
+                  }
+                }
+              }
+            },
+            "ignoredDirectories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "directory",
+                  "files"
+                ],
+                "properties": {
+                  "directory": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "$ref": "#/$defs/count"
+                  }
+                }
+              }
+            },
+            "truncationReasons": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "scanned_path_cap",
+                  "directory_path_cap"
+                ]
+              }
+            },
+            "totals": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "scannedFiles",
+                "scannedFilesListed",
+                "directoriesListed",
+                "ignoredFiles",
+                "ignoredDirectories",
+                "unexpectedFiles",
+                "truncated"
+              ],
+              "properties": {
+                "scannedFiles": {
+                  "$ref": "#/$defs/count"
+                },
+                "scannedFilesListed": {
+                  "$ref": "#/$defs/count"
+                },
+                "directoriesListed": {
+                  "$ref": "#/$defs/count"
+                },
+                "ignoredFiles": {
+                  "$ref": "#/$defs/count"
+                },
+                "ignoredDirectories": {
+                  "$ref": "#/$defs/count"
+                },
+                "unexpectedFiles": {
+                  "$ref": "#/$defs/count"
+                },
+                "truncated": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "const": "not_observed"
+            },
+            "reason": {
+              "enum": [
+                "no_archive"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "const": "withheld"
+            },
+            "reason": {
+              "enum": [
+                "free_plan"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "completion": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "statusSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "headline",
+        "reasonCodes"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "complete_clean",
+            "complete_with_findings",
+            "partial",
+            "failed"
+          ]
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasonCodes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "complete_no_findings",
+              "complete_with_findings",
+              "rule_execution_failed",
+              "finding_budget_exhausted",
+              "cross_file_budget_exhausted",
+              "report_findings_truncated",
+              "dependency_audit_incomplete",
+              "dependency_audit_not_performed",
+              "dependency_versions_unresolved",
+              "files_skipped",
+              "unsafe_files_skipped",
+              "unsupported_languages",
+              "unread_extensions",
+              "partial_rule_coverage",
+              "scan_deadline_exceeded",
+              "scan_failed",
+              "input_not_found",
+              "input_not_a_directory",
+              "input_empty",
+              "input_truncated_before_any_file",
+              "invalid_config",
+              "scan_timeout",
+              "unsafe_production_host",
+              "pipeline_failure"
+            ]
+          }
+        }
+      }
+    },
+    "coverageLevel": {
+      "enum": [
+        "full",
+        "partial",
+        "none"
+      ]
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ruleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "label",
+        "status"
+      ],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "failed",
+            "passed",
+            "not_applicable",
+            "not_completed"
+          ]
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverageLevel"
+        },
+        "coverageReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "coverage"
+            ],
+            "properties": {
+              "coverage": {
+                "const": "full"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "enum": [
+                  "partial",
+                  "none"
+                ]
+              }
+            },
+            "required": [
+              "coverage"
+            ]
+          },
+          "then": {
+            "required": [
+              "coverageReason"
+            ],
+            "properties": {
+              "coverageReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "languagesDetected",
+        "languagesAnalysed",
+        "analysisMethodByLanguage",
+        "frameworksDetected",
+        "filesAnalysed",
+        "filesSkipped",
+        "partiallyCoveredRules",
+        "unsupportedLanguages",
+        "reasons"
+      ],
+      "properties": {
+        "languagesDetected": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "languagesAnalysed": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "analysisMethodByLanguage": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "frameworksDetected": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "filesAnalysed": {
+          "$ref": "#/$defs/count"
+        },
+        "filesSkipped": {
+          "$ref": "#/$defs/count"
+        },
+        "filesSkippedUnsafe": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "filesSkippedInWalk": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unreadExtensions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "skippedByReason": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "scanFit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reasons",
+            "also"
+          ],
+          "properties": {
+            "reasons": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "few_code_files",
+                  "other_language",
+                  "no_recognised_setup",
+                  "no_package_list"
+                ]
+              }
+            },
+            "codeFilesRead": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            },
+            "also": {
+              "type": "array",
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 600
+              }
+            }
+          }
+        },
+        "unsupportedLanguages": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "reasons": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "partiallyCoveredRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ruleId",
+              "coverage",
+              "coverageReason"
+            ],
+            "properties": {
+              "ruleId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "coverage": {
+                "enum": [
+                  "partial",
+                  "none"
+                ]
+              },
+              "coverageReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "id",
+        "ruleId",
+        "title",
+        "severity",
+        "confidence",
+        "userExplanation",
+        "technicalExplanation",
+        "category"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^f_[0-9a-f]{12}$"
+        },
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "filePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "userExplanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "technicalExplanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixHint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixPrompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependency": {
+          "type": "object"
+        },
+        "detectionKind": {
+          "enum": [
+            "pattern",
+            "absence"
+          ]
+        },
+        "detectionMethod": {
+          "enum": [
+            "deterministic",
+            "heuristic"
+          ]
+        },
+        "stableId": {
+          "type": "string",
+          "pattern": "^fi1_[0-9a-f]{16}$"
+        },
+        "aiReview": {
+          "$ref": "#/$defs/aiReview"
+        },
+        "adjudication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required",
+            "reason",
+            "basis"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "reason": {
+              "enum": [
+                "database_backed_dependency_advisory",
+                "archive_entry_name_observation",
+                "storage_bucket_public_flag_observation",
+                "supabase_rls_unverifiable_from_source"
+              ]
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "locked": {
+          "const": true
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "locked": {
+                "const": true
+              }
+            },
+            "required": [
+              "locked"
+            ]
+          },
+          "then": {
+            "properties": {
+              "locked": true
+            },
+            "required": [
+              "locked"
+            ]
+          },
+          "else": {
+            "properties": {
+              "filePath": true,
+              "lineStart": true,
+              "lineEnd": true,
+              "evidence": true,
+              "fixHint": true,
+              "fixPrompt": true
+            },
+            "required": [
+              "filePath",
+              "lineStart",
+              "lineEnd",
+              "evidence",
+              "fixHint",
+              "fixPrompt"
+            ]
+          }
+        }
+      ]
+    },
+    "routeSecurityEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filePath",
+        "line",
+        "kind",
+        "detail"
+      ],
+      "properties": {
+        "filePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "routeControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "present",
+            "absent",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/routeSecurityEvidence"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "routeDatabaseOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filePath",
+        "line",
+        "client",
+        "kind"
+      ],
+      "properties": {
+        "filePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "client": {
+          "enum": [
+            "supabase",
+            "prisma",
+            "drizzle",
+            "firebase",
+            "sql"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "select",
+            "insert",
+            "update",
+            "delete",
+            "upsert",
+            "read",
+            "write",
+            "raw_sql"
+          ]
+        },
+        "table": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "routeSecurityProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "filePath",
+        "framework",
+        "routePath",
+        "method",
+        "line",
+        "analysisStatus",
+        "analysisReasons",
+        "reachableFiles",
+        "authentication",
+        "authorization",
+        "inputValidation",
+        "rateLimit",
+        "csrfProtection",
+        "databaseOperations",
+        "sensitiveEnvVars",
+        "securitySinks"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^route_[0-9a-f]{12}$"
+        },
+        "filePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "framework": {
+          "enum": [
+            "nextjs_pages",
+            "nextjs_app",
+            "sveltekit",
+            "express",
+            "fastapi",
+            "flask",
+            "django",
+            "generic"
+          ]
+        },
+        "routePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "analysisStatus": {
+          "enum": [
+            "complete",
+            "partial"
+          ]
+        },
+        "analysisReasons": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "reachableFiles": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "authentication": {
+          "$ref": "#/$defs/routeControl"
+        },
+        "authorization": {
+          "$ref": "#/$defs/routeControl"
+        },
+        "inputValidation": {
+          "$ref": "#/$defs/routeControl"
+        },
+        "rateLimit": {
+          "$ref": "#/$defs/routeControl"
+        },
+        "csrfProtection": {
+          "$ref": "#/$defs/routeControl"
+        },
+        "databaseOperations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/routeDatabaseOperation"
+          }
+        },
+        "sensitiveEnvVars": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "securitySinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/routeSecurityEvidence"
+          }
+        }
+      }
+    },
+    "dependencyAudit": {
+      "type": "object",
+      "required": [
+        "performed",
+        "incomplete",
+        "source",
+        "dependenciesCollected",
+        "checked",
+        "notChecked",
+        "vulnerabilities",
+        "diagnostics",
+        "note"
+      ],
+      "properties": {
+        "performed": {
+          "type": "boolean"
+        },
+        "incomplete": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "datasetDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "cacheAgeDays": {
+          "$ref": "#/$defs/count"
+        },
+        "dependenciesCollected": {
+          "$ref": "#/$defs/count"
+        },
+        "checked": {
+          "$ref": "#/$defs/count"
+        },
+        "notChecked": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "vulnerabilities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "diagnostics": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "outcomes": {
+          "type": "object"
+        },
+        "checkCoverage": {
+          "type": "object"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ruleFindingSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "label",
+        "occurrences",
+        "highestSeverity"
+      ],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "highestSeverity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ruleFindingSummaryLegacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "error",
+        "occurrences",
+        "highestSeverity"
+      ],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "highestSeverity": {
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "error": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ruleResultLegacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "error",
+        "status"
+      ],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "failed",
+            "passed",
+            "not_applicable",
+            "not_completed"
+          ]
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverageLevel"
+        },
+        "coverageReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "error": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "coverage"
+            ],
+            "properties": {
+              "coverage": {
+                "const": "full"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "enum": [
+                  "partial",
+                  "none"
+                ]
+              }
+            },
+            "required": [
+              "coverage"
+            ]
+          },
+          "then": {
+            "required": [
+              "coverageReason"
+            ],
+            "properties": {
+              "coverageReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

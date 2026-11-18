@@ -1,0 +1,28 @@
+{
+  "reportVersion": "1.1",
+  "scanId": "scan_0000000000000000",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "scanStatus": "incomplete",
+  "codeScanStatus": "incomplete",
+  "dependencyAuditStatus": "not_performed",
+  "warnings": ["Compatibility fixture only."],
+  "summary": { "totalFindings": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "detectedStacks": [] },
+  "failedRules": [],
+  "ruleResults": [],
+  "coverage": {
+    "languagesDetected": [], "languagesAnalysed": [], "analysisMethodByLanguage": {},
+    "frameworksDetected": [], "filesAnalysed": 0, "filesSkipped": 0,
+    "partiallyCoveredRules": [], "unsupportedLanguages": [],
+    "reasons": ["No source was analysed in this compatibility fixture."]
+  },
+  "findings": [],
+  "fileMapSummary": { "totalFiles": 0, "totalSkipped": 0, "byLabel": {} },
+  "projectMapSummary": {
+    "apiRoutes": 0, "frontendComponents": 0, "authFiles": 0, "middlewareFiles": 0,
+    "databaseFiles": 0, "envFiles": 0, "configFiles": 0, "databaseCalls": 0, "dangerousOperations": 0
+  },
+  "dependencyAudit": {
+    "performed": false, "incomplete": true, "source": "none", "dependenciesCollected": 0,
+    "checked": 0, "notChecked": [], "vulnerabilities": [], "diagnostics": [], "note": "Not performed."
+  }
+}

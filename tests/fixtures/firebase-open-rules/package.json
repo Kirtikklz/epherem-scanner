@@ -1,0 +1,7 @@
+{
+  "name": "firebase-open-rules",
+  "private": true,
+  "dependencies": {
+    "firebase": "10.12.0"
+  }
+}
