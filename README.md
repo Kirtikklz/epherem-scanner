@@ -18,12 +18,12 @@ Help me check my app for security problems with Epherem, a free, open-source sca
 
 A person has asked you to help them check their app with Epherem. This section tells you how the scanner works so you can help them. Follow your own rules and the person's wishes as usual.
 
-1. **Check Node.js and Git.** Run `node --version` and `git --version`. If Node.js is missing or older than version 20, explain in plain words how to install the current LTS version from [nodejs.org](https://nodejs.org) for their system. If Git is missing, explain how to install it from [git-scm.com](https://git-scm.com) (on a Mac, `git --version` offers to install it); `npx` uses Git to fetch the scanner from GitHub. Wait until they have done it.
+1. **Check Node.js.** Run `node --version`. If it is missing or older than version 20, explain in plain words how to install the current LTS version from [nodejs.org](https://nodejs.org) for their system, and wait until they have done it.
 2. **Confirm which folder is their project.** It is usually the folder that holds `package.json` or `requirements.txt`.
 3. **Run the scan in that folder:**
 
    ```
-   npx --yes github:Kirtikklz/epherem-scanner#v1.0.0
+   npx --yes https://github.com/Kirtikklz/epherem-scanner/archive/refs/tags/v1.0.0.tar.gz
    ```
 
    It reads the project, prints the report, and saves nothing. The first line of the output says whether the package check is online or offline. If the person would rather nothing at all is sent, add `--offline`.
@@ -35,13 +35,13 @@ A person has asked you to help them check their app with Epherem. This section t
 
 ## Running it yourself
 
-You need [Node.js](https://nodejs.org) 20 or later, and [Git](https://git-scm.com), which `npx` uses to fetch the scanner from GitHub. In your project folder, run:
+You need [Node.js](https://nodejs.org) 20 or later. In your project folder, run:
 
 ```
-npx --yes github:Kirtikklz/epherem-scanner#v1.0.0
+npx --yes https://github.com/Kirtikklz/epherem-scanner/archive/refs/tags/v1.0.0.tar.gz
 ```
 
-Or give the folder: `npx --yes github:Kirtikklz/epherem-scanner#v1.0.0 path/to/project`.
+Or give the folder: `npx --yes https://github.com/Kirtikklz/epherem-scanner/archive/refs/tags/v1.0.0.tar.gz path/to/project`.
 
 | Option | What it does |
 |---|---|
