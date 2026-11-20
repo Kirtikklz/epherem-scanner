@@ -1,6 +1,6 @@
 {
   "name": "epherem-scanner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A free, open-source security scanner for apps built with AI tools. It reads your project's source code on your own computer, prints a report and saves nothing.",
   "license": "Apache-2.0",
   "repository": "github:Kirtikklz/epherem-scanner",

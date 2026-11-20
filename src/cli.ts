@@ -10,7 +10,7 @@ import { scanProject } from './scanProject.js';
 import { ScannerError } from './shared/errors.js';
 import type { ScanReport } from './shared/types.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';
 
 export const USAGE = 'Usage: epherem-scanner [project-folder] [--json] [--severity high|medium|low] [--offline] [--html <file>] [--help] [--version]';
 

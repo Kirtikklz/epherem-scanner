@@ -17,17 +17,17 @@ With the bundled vulnerability data of 17 November 2026 and no network, the scan
 
 Every finding on the main test set is classified against a written rubric of five labels: a real problem worth fixing; a real problem that is poorly explained; uncertain without information the scanner can't have; correct but repetitive or low value; or a false alarm. Each classification records the file and line it was judged from and a reason.
 
-When a false alarm was traced to its cause, the check was narrowed. A change that moves any finding on the main test set has to list every finding it moves, each with its reason, and a check refuses the change if the list and the real difference disagree; 30 such lists are on record.
+When a false alarm was traced to its cause, the check was narrowed. A change that moves any finding on the main test set has to list every finding it moves, each with its reason, and a check refuses the change if the list and the real difference disagree; 29 such lists are on record.
 
 No accuracy percentage is published. The labels were not made by independent security reviewers, so they show how consistent the scanner is, not how accurate it is.
 
 ## Test apps with planted problems
 
-31 small test projects hold known problems, most of them planted on purpose: injection, path traversal, cross-site scripting, request forgery, missing ownership checks, open database rules and others. Changes to the scanner are checked against them, and their reports are expected to stay byte-for-byte the same unless a change is meant to move them.
+32 small test projects hold known problems, most of them planted on purpose: injection, path traversal, cross-site scripting, request forgery, missing ownership checks, open database rules and others. Changes to the scanner are checked against them, and their reports are expected to stay byte-for-byte the same unless a change is meant to move them.
 
 ## Automated tests
 
-The full test suite has 4,461 tests. This repository carries the 2,412 of them that run without the private test data (`npm test`).
+The full test suite has 4,477 tests. This repository carries the 2,499 of them that run without the private test data (`npm test`).
 
 Many safety properties in the code are also checked by a deliberate break: a small edit that should make a test fail, run to prove the test does fail. 1,625 such edits to the scanner are on record.
 
