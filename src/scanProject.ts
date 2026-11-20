@@ -5,6 +5,7 @@ import {
 import { dependencyVulnerabilitiesToFindings } from './dependency-audit/dependencyFindings.js';
 import { createDependencyOriginResolver } from './dependency-audit/dependencyOrigin.js';
 import { archiveEntryFindings } from './archive-findings/archiveEntryFindings.js';
+import { folderWatchList } from './archive-findings/folderWatchList.js';
 import { sqlDumpContentLookup } from './archive-findings/sqlDumpContent.js';
 import { absenceFindings, ENABLED_ABSENCE_TAGS } from './candidates/absence/absenceFindings.js';
 import { buildFileMap } from './file-map/buildFileMap.js';
@@ -39,6 +40,7 @@ export interface ScanOptions {
   archiveSkippedFileCount?: number;
   archiveIgnored?: ArchiveIgnoredCarry;
   archiveWatchList?: ArchiveWatchListCarry;
+  watchFolderNames?: boolean;
   onlyPaths?: ReadonlySet<string>;
   absenceTags?: ReadonlySet<string>;
   // Optional extra pass after the rules; absent means nothing runs.
@@ -50,14 +52,17 @@ export async function scanProject(inputPath: string, options: ScanOptions = {}):
   const deadlineMs = validateDeadlineMs(options.deadlineMs);
   const maxFindings = validateMaxFindings(options.maxFindings ?? MAX_TOTAL_FINDINGS);
 
+  const folderNames = options.watchFolderNames === true && options.archiveWatchList === undefined ? folderWatchList() : undefined;
   const prepareOptions: PrepareInputOptions = {
     limits,
+    ...(folderNames !== undefined ? { onFileName: (relativePath: string) => folderNames.observe(relativePath) } : {}),
     ...(options.onlyPaths !== undefined ? { onlyPaths: options.onlyPaths } : {}),
     ...(options.archiveIgnored !== undefined
       ? { refusedBeforeWalk: { byExtension: options.archiveIgnored.byExtension, ...(options.archiveIgnored.nestedArchive !== undefined ? { nestedArchive: options.archiveIgnored.nestedArchive } : {}) } }
       : {}),
   };
   const prepared = await prepareInput(inputPath, prepareOptions);
+  if (folderNames !== undefined) options = { ...options, archiveWatchList: folderNames.carry() };
   const fileMap = buildFileMap(prepared);
   const detectedStack = detectStack(fileMap);
   const scanFit = options.onlyPaths === undefined && (prepared.skippedByReason?.scan_limit_reached ?? 0) === 0

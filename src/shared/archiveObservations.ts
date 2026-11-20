@@ -79,6 +79,7 @@ export interface UnexpectedFileGroupRecord {
 export interface ArchiveWatchListCarry {
   rootPrefix?: string;
   groups: UnexpectedFileGroupRecord[];
+  source?: 'folder';
 }
 
 export interface IgnoredDirectoryTally {

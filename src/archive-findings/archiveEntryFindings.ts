@@ -79,6 +79,25 @@ const RULES: Record<ArchiveEntryRuleId, ArchiveRuleSpec> = {
   },
 };
 
+const FOLDER_WORDING: Record<ArchiveEntryRuleId, Pick<ArchiveRuleSpec, 'userExplanation' | 'technicalExplanation'>> = {
+  private_key_or_credential_file: {
+    userExplanation:
+      'A file whose name marks it as a private key or credential store is in this project folder. This finding is based on the file\'s name; some such files hold only a public certificate. If the file is committed or shared with the code, anyone who gets a copy of the project also gets it, and if it holds a real key, a key that has been copied is a key that has to be replaced — deleting the file is not enough on its own.',
+    technicalExplanation:
+      'A file name in the scanned folder matched the private-key / cloud-credential watch-list. Key material and credentials must never be committed: if this file holds any and has ever been committed or shared, assume they are disclosed to everyone who has had a copy of the repository, including its history.',
+  },
+  data_artefact_committed: {
+    userExplanation:
+      'A database file, a database dump, or an infrastructure state file is in this project folder. These usually hold real data or real infrastructure detail — customer records, password hashes, resource names, and sometimes credentials — and they are rarely meant to travel with the code.',
+    technicalExplanation:
+      'A file name in the scanned folder matched the database-dump / infrastructure-state watch-list. Dumps commonly contain production or production-like personal data; Terraform state files record resource identifiers and can contain credentials in plain text. Neither belongs in a source repository.',
+  },
+};
+
+function specFor(spec: ArchiveRuleSpec, carry: ArchiveWatchListCarry): ArchiveRuleSpec {
+  return carry.source === 'folder' ? { ...spec, ...FOLDER_WORDING[spec.ruleId] } : spec;
+}
+
 const ARCHIVE_NAME_ADJUDICATION_POLICY: FindingAdjudicationPolicy = {
   required: false,
   reason: 'archive_entry_name_observation',
@@ -89,6 +108,18 @@ const ARCHIVE_NAME_ADJUDICATION_POLICY: FindingAdjudicationPolicy = {
     'entry with this name, which is the observation itself. NOT CLAIMED: nothing has been measured for these two rules; ' +
     'the exemption rests on there being nothing to judge.',
 };
+
+const FOLDER_NAME_BASIS =
+  'This finding is an observation of a file NAME in the scanned folder, not an inference about code. ' +
+  'COMPOSITION OF THE ARGUMENT: the file was matched by its name alone, so no further evidence about this finding ' +
+  'exists in the scan, and the only question left would be whether the folder contains a file with this name, ' +
+  'which is the observation itself. NOT CLAIMED: nothing has been measured for these two rules; ' +
+  'the exemption rests on there being nothing to judge.';
+
+function withFolderBasis(finding: Finding, tally: RuleTally): Finding {
+  if (!tally.inFolder || finding.adjudication === undefined) return finding;
+  return { ...finding, adjudication: { ...finding.adjudication, basis: FOLDER_NAME_BASIS } };
+}
 
 export interface ArchiveEntryFindingsResult {
   findings: Finding[];
@@ -107,10 +138,11 @@ interface RuleTally {
   alreadyProven: number;
   unnamedPath: number;
   readAndNoData: number;
+  inFolder: boolean;
 }
 
-function emptyTally(): RuleTally {
-  return { matched: 0, named: 0, beyondSample: 0, alreadyProven: 0, unnamedPath: 0, readAndNoData: 0 };
+function emptyTally(inFolder: boolean): RuleTally {
+  return { matched: 0, named: 0, beyondSample: 0, alreadyProven: 0, unnamedPath: 0, readAndNoData: 0, inFolder };
 }
 
 export const UNREAD_SQL_DUMP_EVIDENCE = 'Name suggests a database dump; contents not read';
@@ -146,6 +178,13 @@ function shortfallSentence(spec: ArchiveRuleSpec, tally: RuleTally): string {
   if (tally.readAndNoData > 0) {
     causes.push(`${tally.readAndNoData} named like a dump whose contents were read and hold no data, so they are not dumps`);
   }
+  if (tally.inFolder) {
+    return (
+      `${tally.matched} ${spec.plural} were found in this folder and this report names ${tally.named} of them: ` +
+      `${causes.join('; ')}. ` +
+      `The finding list is a FLOOR, not the count; the exact total is ${tally.matched}.`
+    );
+  }
   return (
     `${tally.matched} ${spec.plural} were found in this upload and this report names ${tally.named} of them: ` +
     `${causes.join('; ')}. ` +
@@ -165,14 +204,14 @@ export function archiveEntryFindings(
   const tallyFor = (ruleId: ArchiveEntryRuleId): RuleTally => {
     const existing = tallies.get(ruleId);
     if (existing !== undefined) return existing;
-    const fresh = emptyTally();
+    const fresh = emptyTally(carry.source === 'folder');
     tallies.set(ruleId, fresh);
     return fresh;
   };
 
   for (const group of carry.groups) {
     const ruleId = CATEGORY_RULE[group.category];
-    const spec = RULES[ruleId];
+    const spec = specFor(RULES[ruleId], carry);
     const tally = tallyFor(ruleId);
     tally.matched += group.count;
     tally.beyondSample += Math.max(0, group.count - group.sample.paths.length);
@@ -237,7 +276,7 @@ function findingsForGroup(
     }
     const unread = sqlContent === 'not_read';
     tally.named += 1;
-    findings.push({
+    findings.push(withFolderBasis({
       ...makeFinding({
         ruleId: spec.ruleId,
         title: spec.title,
@@ -253,7 +292,7 @@ function findingsForGroup(
         extraFixRequirements: spec.extraFixRequirements,
       }),
       adjudication: ARCHIVE_NAME_ADJUDICATION_POLICY,
-    });
+    }, tally));
   });
 
   return findings;

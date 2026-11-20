@@ -15,6 +15,7 @@ export interface PrepareInputOptions {
   limits?: Partial<InputLimits>;
   onlyPaths?: ReadonlySet<string>;
   refusedBeforeWalk?: RefusedBeforeWalk;
+  onFileName?: (relativePath: string) => void;
 }
 
 interface WalkState {
@@ -32,6 +33,7 @@ interface WalkState {
   deepNestingNamed: number;
   deepNestingTotal: number;
   links: CappedNames;
+  onFileName: ((relativePath: string) => void) | undefined;
   startedAt: number;
   truncated: boolean;
 }
@@ -80,6 +82,7 @@ export async function prepareInput(
     deepNestingNamed: 0,
     deepNestingTotal: 0,
     links: new CappedNames(),
+    onFileName: options.onFileName,
     startedAt: Date.now(),
     truncated: false,
   };
@@ -220,6 +223,7 @@ async function walkDirectory(state: WalkState, currentPath: string, depth: numbe
     if (!entry.isFile()) continue;
 
     if (state.onlyPaths !== null && !state.onlyPaths.has(relativePath)) continue;
+    state.onFileName?.(relativePath);
 
     const extension = extensionOf(entry.name);
     const skipReason = isPythonRequirementsPath(relativePath) ? undefined : preOpenSkipReason(entry.name, extension);

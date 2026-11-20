@@ -141,6 +141,7 @@ async function scanAndReport(args: CliArgs, io: CliIo): Promise<number> {
     : undefined;
   const report: ScanReport = await scanProject(folder, {
     deadlineMs: DEPENDENCY_DEADLINE_MS,
+    watchFolderNames: true,
     ...(dependencyScanner !== undefined ? { dependencyScanner } : {}),
   });
 
