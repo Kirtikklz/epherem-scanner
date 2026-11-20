@@ -546,11 +546,15 @@ export function startHere(model: ReportModel): ReportEntry[] {
     (e) => e.group === 'likely' && e.sev === 'critical',
     (e) => e.group === 'likely' && e.sev === 'high',
     (e) => e.group === 'known' && SERIOUS.has(e.sev),
+    (e) => e.group === 'likely' && e.sev === 'medium',
+    (e) => e.group === 'known' && e.sev === 'medium',
+    (e) => e.group === 'likely' && e.sev === 'low',
+    (e) => e.group === 'known' && e.sev === 'low',
     (e) => e.group === 'check' && SERIOUS.has(e.sev),
   ];
   const out: ReportEntry[] = [];
   for (const rule of rules) for (const e of model.entries) if (out.length < 3 && rule(e)) out.push(e);
-  return out;
+  return out[0]?.group === 'check' ? [] : out;
 }
 
 export function countSentence(findings: number, places: number): string {
