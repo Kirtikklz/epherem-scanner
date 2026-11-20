@@ -1,3 +1,4 @@
+import { adviceFor } from '../rules/fixAdviceByLanguage.js';
 import type { Confidence, DetectionKind, DetectionMethod, Finding, FindingCategory, Severity } from './types.js';
 import { buildFindingId } from './utils.js';
 
@@ -22,6 +23,8 @@ export function makeFinding(input: FindingInput): Finding {
   const lineEnd = input.lineEnd ?? input.lineStart;
   const detectionKind: DetectionKind = input.detectionKind ?? 'pattern';
   const detectionMethod: DetectionMethod = detectionKind === 'absence' ? 'heuristic' : 'deterministic';
+  const fixHint = adviceFor(input.filePath, input.fixHint);
+  const extraRequirements = input.extraFixRequirements?.map((line) => adviceFor(input.filePath, line));
   return {
     id: buildFindingId(input.ruleId, input.filePath, input.lineStart, input.evidence),
     ruleId: input.ruleId,
@@ -34,9 +37,9 @@ export function makeFinding(input: FindingInput): Finding {
     lineStart: input.lineStart,
     lineEnd,
     evidence: input.evidence,
-    userExplanation: input.userExplanation,
+    userExplanation: adviceFor(input.filePath, input.userExplanation),
     technicalExplanation: input.technicalExplanation,
-    fixHint: input.fixHint,
+    fixHint,
     fixPrompt: buildFixPrompt({
       ruleId: input.ruleId,
       title: input.title,
@@ -49,8 +52,8 @@ export function makeFinding(input: FindingInput): Finding {
       lineEnd,
       evidence: input.evidence,
       technicalExplanation: input.technicalExplanation,
-      fixHint: input.fixHint,
-      ...(input.extraFixRequirements !== undefined ? { extraRequirements: input.extraFixRequirements } : {}),
+      fixHint,
+      ...(extraRequirements !== undefined ? { extraRequirements } : {}),
     }),
     category: input.category,
   };
